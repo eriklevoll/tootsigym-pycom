@@ -1,1 +1,1 @@
-# tootsigym-pycom
+# WS2812 neopixel pycom bluetooth controller
