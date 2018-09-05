@@ -2,8 +2,6 @@ from ws2812 import WS2812
 from BLE import BLE
 from led_control import Control
 from utilities import increment_color_all, decrement_color_all
-from network import Bluetooth
-import time
 
 
 NUM_OF_LEDS = 100

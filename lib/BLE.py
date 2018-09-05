@@ -20,6 +20,9 @@ class BLE:
         self.bluetooth.callback(trigger=Bluetooth.CLIENT_CONNECTED | Bluetooth.CLIENT_DISCONNECTED | Bluetooth.NEW_ADV_EVENT, handler=self.connection_callback)
 
     def start_scan(self):
+        """
+        Starts BLE scan
+        """
         self.bluetooth.start_scan(-1)
 
     def connection_callback(self, bt_o):
@@ -28,7 +31,7 @@ class BLE:
         """
         events = bt_o.events()
         if  events & Bluetooth.CLIENT_CONNECTED:
-            print("Device connected", bt_o)
+            print("Device connected")
         elif events & Bluetooth.CLIENT_DISCONNECTED:
             print("Device disconnected")
         elif events & Bluetooth.NEW_ADV_EVENT:
@@ -36,44 +39,58 @@ class BLE:
             self.parse_adv()
 
     def parse_adv(self):
+        """
+        Parse advertisement package data
+        """
         adv = self.bluetooth.get_adv()
         if not adv: return
 
         device_name = self.bluetooth.resolve_adv_data(adv.data, Bluetooth.ADV_NAME_CMPL)
         if "MB_APP" in device_name:
             id = device_name.split(":::")[1]
-            if (id in self.devices_dict):
-                print ("juba on", id, self.devices_dict)
-                return
+            if (id in self.devices_dict): return
+
             print (id, self.devices_dict)
             print ("Connecting")
+
             conn = self.bluetooth.connect(adv.mac)
             self.devices_dict[id] = conn
             time.sleep(0.050)
-            services = conn.services()
-            for service in services:
-                time.sleep(0.050)
-                if type(service.uuid()) == bytes:
-                    print('Reading chars from service = {}'.format(service.uuid()))
-                else:
-                    print('Reading chars from service = %x' % service.uuid())
-                chars = service.characteristics()
-                for char in chars:
-                    if (char.properties() & Bluetooth.PROP_READ):
-                        print('char {} value = {}'.format(char.uuid(), char.read()))
-                        val = char.read().decode('utf-8')
-                        if (val == id):
-                            char.callback(trigger=Bluetooth.CHAR_NOTIFY_EVENT, handler=self.characteristic_callback)
-                            char.write(b'CONN_OK')
-                        print ("val:", val, val == id)
+
+            self.parse_services(conn.services(), id)
 
             print ("Started scanning again")
             self.bluetooth.start_scan(-1)
             time.sleep(0.050)
 
+    def parse_services(self, services, id):
+        """
+        Loop through connection services
+        """
+        for service in services:
+            time.sleep(0.050)
+            self.parse_characteristics(service.characteristics(), id)
 
+    def parse_characteristics(self, chars, id):
+        """
+        Loop through service characteristics
+        """
+        for char in chars:
+            if (char.properties() & Bluetooth.PROP_READ):
+                if (char.read().decode('utf-8') == id):
+                    self.set_notify_listener(char)
+
+    def set_notify_listener(self, char):
+        """
+        Set notify trigger on characteristic
+        """
+        char.callback(trigger=Bluetooth.CHAR_NOTIFY_EVENT, handler=self.characteristic_callback)
+        char.write(b'CONN_OK')
 
     def characteristic_callback(self, characteristic):
+        """
+        Callback function for GATT characteristic
+        """
         print ('Bluetooth.CHAR_NOTIFY_EVENT')
         char_value = characteristic.value().decode('utf-8')
         print (char_value)
@@ -109,24 +126,6 @@ class BLE:
         uuid = uuid.encode().replace(b'-',b'')
         tmp = binascii.unhexlify(uuid)
         return bytes(reversed(tmp))
-    #
-    # def detect_write_event(self, value):
-    #     """
-    #     Chooses correct response for new characteristic value
-    #     """
-        # val = value.decode("utf-8").split(",")
-        # size = len(val)
-        # if (size == 0):
-        #     print ("bad input")
-        # elif (size == 1):
-        #     self.led_control.turn_off_leds()
-        # elif (size == 2):
-        #     self.led_control.set_new_data((val[0], val[1], val[1], val[1]))
-        # elif (size == 4):
-        #     self.led_control.set_new_data((val[0], val[1], val[2], val[3]))
-        # else:
-        #     print ("wrong number of parameters")
-        # print (val)
 
     def parse_char_data(self, char_value):
         """
