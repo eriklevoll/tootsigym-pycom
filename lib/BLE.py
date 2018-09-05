@@ -4,18 +4,6 @@ from machine import Timer
 import time
 import binascii
 import machine
-import _thread
-
-NORMAL_OPERATION        =   b'\x00'
-DISABLE_NETWORK_DATA    =   b'\x01'
-ENABLE_NETWORK_DATA     =   b'\x02'
-OPEN_LASERS             =   b'\x03'
-CLOSE_LASERS            =   b'\x04'
-VIEW_LASER_DATA         =   b'\x05'
-HIDE_LASER_DATA         =   b'\x06'
-UPDATE_OTA              =   b'\x07'
-SEND_ONETIME            =   b'\x08'
-
 
 class BLE:
     def __init__(self, led_control):
@@ -27,65 +15,15 @@ class BLE:
         """
         self.led_control    = led_control
         self.bluetooth      = Bluetooth()
-        self.scanning       = False
-        self.scanning_timer = Timer.Alarm(self.scan_timer_elapsed, s=3, periodic=True)
+        #self.scanning       = False
+        #self.scanning_timer = Timer.Alarm(self.scan_timer_elapsed, s=3, periodic=True)
         self.devices_dict   = {}
 
         #self.bluetooth.callback(trigger=Bluetooth.CLIENT_CONNECTED | Bluetooth.CLIENT_DISCONNECTED, handler=self.connection_callback)
-        self.bluetooth.callback(trigger = Bluetooth.NEW_ADV_EVENT, handler = self.new_adv_event)
+        self.bluetooth.callback(trigger=Bluetooth.CLIENT_CONNECTED | Bluetooth.CLIENT_DISCONNECTED | Bluetooth.NEW_ADV_EVENT, handler=self.connection_callback)
 
-    def new_adv_event(self, event):
-        if event.events() == Bluetooth.NEW_ADV_EVENT:
-            adv = self.bluetooth.get_adv()
-            device_name = self.bluetooth.resolve_adv_data(adv.data, Bluetooth.ADV_NAME_CMPL)
-
-            if (device_name is None): return
-            if ("MB_APP" not in device_name): return
-
-            device_id = self.get_device_id(device_name)
-
-            if (device_id in self.devices_dict): return
-
-            print (device_name, adv.mac)
-            connection = self.bluetooth.connect(adv.mac)
-            self.devices_dict[device_id] = connection
-            #
-            services = connection.services()
-            for service in services:
-                if (type(service.uuid()) is bytes):
-                    chars = service.characteristics()
-                    for char in chars:
-                        if (type(char.uuid()) is bytes):
-                            print ("Set callback")
-                            char.callback(trigger=Bluetooth.CHAR_NOTIFY_EVENT, handler=self.characteristic_callback)
-            #     print (service.uuid())
-            #     if (type(service.uuid()) is bytes):
-            #         service.characteristics()
-                #for char in chars:
-            #        pass
-
-            #time.sleep(0.1)
-            #self.bluetooth.start_scan(-1)
-            #     print (service)
-            #         print (char)
-            #         if (type(char.uuid()) is bytes):
-            #             char.callback(trigger=Bluetooth.CHAR_NOTIFY_EVENT, handler=self.characteristic_callback)
-            #self.set_notify_listener(services)
-            # for service in services:
-            #     chars = service.characteristics()
-            #     for char in chars:
-            #         if (type(char.uuid()) is bytes):
-            #             char.callback(trigger=Bluetooth.CHAR_NOTIFY_EVENT, handler=self.characteristic_callback)
-
-    def set_notify_listener(self, services):
-        try:
-            for service in services:
-                chars = service.characteristics()
-                for char in chars:
-                    if (type(char.uuid()) is bytes):
-                        char.callback(trigger=Bluetooth.CHAR_NOTIFY_EVENT, handler=self.characteristic_callback)
-        except:
-            print ("Failed to set notify listener")
+    def start_scan(self):
+        self.bluetooth.start_scan(-1)
 
     def connection_callback(self, bt_o):
         """
@@ -93,105 +31,76 @@ class BLE:
         """
         events = bt_o.events()
         if  events & Bluetooth.CLIENT_CONNECTED:
-            print("Device connected")
+            print("Device connected", bt_o)
         elif events & Bluetooth.CLIENT_DISCONNECTED:
             print("Device disconnected")
+        elif events & Bluetooth.NEW_ADV_EVENT:
+            print ("Got something")
+            self.parse_adv()
 
-    def scan(self, enabled):
-        """
-        Enables or disables bluetooth scanning
+    def parse_adv(self):
+        adv = self.bluetooth.get_adv()
+        if not adv: return
 
-        Args:
-            enabled: True or False
-        """
-        try:
-            if enabled:
-                self.bluetooth.start_scan(-1)
-                self.scanning = True
-            else:
-                self.bluetooth.stop_scan()
-                self.scanning = False
-        except:
-            print ("Failed to set scanning:", enabled)
-
-    def test_thread(self, ble, adv):
-        device_name = ble.resolve_adv_data(adv.data, Bluetooth.ADV_NAME_CMPL)
-        if not device_name: return
-
-        device_id = self.get_device_id(device_name)
-
-        print ("Connecting")
-        connection = ble.connect(adv.mac)
-
-        print (device_id)
-
-    def scan_timer_elapsed(self, _):
-        """
-        Periodic scanning timer method. Read and parse scan results here.
-        """
-        #print ("Scanning:",self.bluetooth.isscanning())
-
-        #if not self.bluetooth.isscanning():
-    #        self.bluetooth.start_scan(-1)
-
-        #
-        # adv = self.bluetooth.get_adv()
-        # print (adv, self.bluetooth.isscanning(), self.devices_dict)
-        #
-        # if not adv:
-        #     pass
-        # else:
-        #     _thread.start_new_thread(self.test_thread, (self.bluetooth, adv))
-            #self.test_thread(self.bluetooth, adv)
-            #self.parse_scan_result(adv)
-
-    def disconnect_device(self, device_id):
-        connection = self.devices_dict[device_id]
-        connection.disconnect()
-        del self.devices_dict[device_id]
-        print ("stopped")
-
-    def parse_scan_result(self, adv):
-        """
-        Read available device services and characteristics.
-        """
         device_name = self.bluetooth.resolve_adv_data(adv.data, Bluetooth.ADV_NAME_CMPL)
-        #Make sure name is not null
-        if not device_name: return
-
-        try:
-            device_id = self.get_device_id(device_name)
-            #Make sure device is already not connected
-            if device_id in self.devices_dict:
-                print ("Device already added")
+        if "MB_APP" in device_name:
+            id = device_name.split(":::")[1]
+            if (id in self.devices_dict):
+                print ("juba on", id, self.devices_dict)
                 return
-            print (device_id)
+            print (id, self.devices_dict)
             print ("Connecting")
-
-            connection = self.bluetooth.connect(adv.mac)
-
-            services = connection.services()
-            connection_established  = False
+            conn = self.bluetooth.connect(adv.mac)
+            self.devices_dict[id] = conn
+            time.sleep(1)
+            services = conn.services()
             for service in services:
+                time.sleep(0.050)
+                if type(service.uuid()) == bytes:
+                    print('Reading chars from service = {}'.format(service.uuid()))
+                else:
+                    print('Reading chars from service = %x' % service.uuid())
                 chars = service.characteristics()
                 for char in chars:
-                    if (type(char.uuid()) is bytes):
-                        self.devices_dict[device_id] = connection
-                        connection_established = True
-                        char.callback(trigger=Bluetooth.CHAR_NOTIFY_EVENT, handler=self.characteristic_callback)
-        except:
-            print ("Failed to parse device data")
+                    if (char.properties() & Bluetooth.PROP_READ):
+                        print('char {} value = {}'.format(char.uuid(), char.read()))
+                        val = char.read().decode('utf-8')
+                        if (val == id):
+                            char.callback(trigger=Bluetooth.CHAR_NOTIFY_EVENT, handler=self.characteristic_callback)
+                            char.write(b'CONN_OK')
+                        print ("val:", val, val == id)
+
+            print ("Started scanning again")
+            self.bluetooth.start_scan(-1)
+            time.sleep(1)
+
+    # def scan(self, enabled):
+    #     """
+    #     Enables or disables bluetooth scanning
+    #
+    #     Args:
+    #         enabled: True or False
+    #     """
+    #     try:
+    #         if enabled:
+    #             self.bluetooth.start_scan(-1)
+    #             self.scanning = True
+    #         else:
+    #             self.bluetooth.stop_scan()
+    #             self.scanning = False
+    #     except:
+    #         print ("Failed to set scanning:", enabled)
+
 
     def characteristic_callback(self, characteristic):
         print ('Bluetooth.CHAR_NOTIFY_EVENT')
-        val = characteristic.value().decode('utf-8')
-        print (val)
-        if ("disconnect" in val):
-            v2 = val.split(":::")[1]
-            print (v2)
-            self.disconnect_device(v2)
-        else:
-            characteristic.write(b'response')
+        char_value = characteristic.value().decode('utf-8')
+        print (char_value)
+        if ("disconnect" in char_value):
+            device_id = char_value.split(":::")[1]
+            conn = self.devices_dict[device_id]
+            conn.disconnect()
+            del self.devices_dict[device_id]
 
     def get_device_id(self, data):
         """
