@@ -1,7 +1,7 @@
 # WS2812 neopixel pycom bluetooth controller
 
 ## Project structure:
-```css
+```
 /lib
     BLE.py          - Class for managing bluetooth connection
     led_control.py  - LED object to control color values
