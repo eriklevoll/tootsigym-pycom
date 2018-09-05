@@ -15,11 +15,8 @@ class BLE:
         """
         self.led_control    = led_control
         self.bluetooth      = Bluetooth()
-        #self.scanning       = False
-        #self.scanning_timer = Timer.Alarm(self.scan_timer_elapsed, s=3, periodic=True)
         self.devices_dict   = {}
 
-        #self.bluetooth.callback(trigger=Bluetooth.CLIENT_CONNECTED | Bluetooth.CLIENT_DISCONNECTED, handler=self.connection_callback)
         self.bluetooth.callback(trigger=Bluetooth.CLIENT_CONNECTED | Bluetooth.CLIENT_DISCONNECTED | Bluetooth.NEW_ADV_EVENT, handler=self.connection_callback)
 
     def start_scan(self):
@@ -52,7 +49,7 @@ class BLE:
             print ("Connecting")
             conn = self.bluetooth.connect(adv.mac)
             self.devices_dict[id] = conn
-            time.sleep(1)
+            time.sleep(0.050)
             services = conn.services()
             for service in services:
                 time.sleep(0.050)
@@ -72,24 +69,8 @@ class BLE:
 
             print ("Started scanning again")
             self.bluetooth.start_scan(-1)
-            time.sleep(1)
+            time.sleep(0.050)
 
-    # def scan(self, enabled):
-    #     """
-    #     Enables or disables bluetooth scanning
-    #
-    #     Args:
-    #         enabled: True or False
-    #     """
-    #     try:
-    #         if enabled:
-    #             self.bluetooth.start_scan(-1)
-    #             self.scanning = True
-    #         else:
-    #             self.bluetooth.stop_scan()
-    #             self.scanning = False
-    #     except:
-    #         print ("Failed to set scanning:", enabled)
 
 
     def characteristic_callback(self, characteristic):
@@ -101,6 +82,8 @@ class BLE:
             conn = self.devices_dict[device_id]
             conn.disconnect()
             del self.devices_dict[device_id]
+        else:
+            self.parse_char_data(char_value)
 
     def get_device_id(self, data):
         """
@@ -126,21 +109,39 @@ class BLE:
         uuid = uuid.encode().replace(b'-',b'')
         tmp = binascii.unhexlify(uuid)
         return bytes(reversed(tmp))
+    #
+    # def detect_write_event(self, value):
+    #     """
+    #     Chooses correct response for new characteristic value
+    #     """
+        # val = value.decode("utf-8").split(",")
+        # size = len(val)
+        # if (size == 0):
+        #     print ("bad input")
+        # elif (size == 1):
+        #     self.led_control.turn_off_leds()
+        # elif (size == 2):
+        #     self.led_control.set_new_data((val[0], val[1], val[1], val[1]))
+        # elif (size == 4):
+        #     self.led_control.set_new_data((val[0], val[1], val[2], val[3]))
+        # else:
+        #     print ("wrong number of parameters")
+        # print (val)
 
-    def detect_write_event(self, value):
+    def parse_char_data(self, char_value):
         """
         Chooses correct response for new characteristic value
         """
-        val = value.decode("utf-8").split(",")
-        size = len(val)
+        data = char_value.split(",")
+        size = len(data)
         if (size == 0):
             print ("bad input")
         elif (size == 1):
             self.led_control.turn_off_leds()
         elif (size == 2):
-            self.led_control.set_new_data((val[0], val[1], val[1], val[1]))
+            self.led_control.set_new_data((data[0], data[1], data[1], data[1]))
         elif (size == 4):
-            self.led_control.set_new_data((val[0], val[1], val[2], val[3]))
+            self.led_control.set_new_data((data[0], data[1], data[2], data[3]))
         else:
             print ("wrong number of parameters")
-        print (val)
+        print (data)
