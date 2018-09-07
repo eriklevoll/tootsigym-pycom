@@ -1,3 +1,5 @@
+NUM_OF_LED_ROWS = 18
+NUM_OF_LED_COLS = 11
 
 class Control:
     def __init__(self, chain, num_of_leds, initial_state = (0,0,0)):
@@ -36,10 +38,12 @@ class Control:
         """
         Change led color
         """
-        i = int(new_data[0])
-        r = int(new_data[1])
-        g = int(new_data[2])
-        b = int(new_data[3])
+        rc = int(new_data[0])
+        r  = int(new_data[1])
+        g  = int(new_data[2])
+        b  = int(new_data[3])
+
+        i = get_index(rc)
 
         if self.check_valid_data(i, r, g, b) == False: return
 
@@ -49,6 +53,28 @@ class Control:
             self.data[i] = (r,g,b)
 
         self.chain.show(self.data)
+
+    def get_index(self, rc):
+        """
+        Extracts row and column values from input
+        and returns corresponding LED index
+        """
+        try:
+            col = ord(rc[0]) - 64
+            row = int(rc[1:])
+            return convert_rc_to_index(row, col)
+        except:
+            return: -1
+
+    def convert_rc_to_index(self, row, col):
+        """
+        Calculate LED index from row column values
+        """
+        if (row % 2 == 0):
+            return NUM_OF_LED_COLS * row + 1 - col
+        else:
+            return NUM_OF_LED_COLS * (row - 1) + c
+
 
     def check_valid_data(self, index, r, g, b):
         """
