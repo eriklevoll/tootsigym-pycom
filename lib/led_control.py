@@ -36,6 +36,20 @@ class Control:
         self.num_of_leds = num_of_leds
         self.chain = chain
         self.data = [initial_state] * num_of_leds
+        self.holds_dict = {}
+
+        self.calculate_holds()
+
+    def calculate_holds(self):
+        """
+        Calculate led indices for existing holds according to HOLDS list
+        """
+        true_counter = 1
+        for i in range(len(HOLDS)):
+            if (HOLDS[i] == False): continue
+            self.holds_dict[i+1] = true_counter
+            true_counter += 1
+
 
     def start(self):
         """
@@ -73,7 +87,8 @@ class Control:
         if i < 0:
             self.set_all_leds(r,g,b)
         else:
-            self.data[i] = (r,g,b)
+            led_index = holds_dict[i]
+            self.data[led_index] = (r,g,b)
 
         self.chain.show(self.data)
 
