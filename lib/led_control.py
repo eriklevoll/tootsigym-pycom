@@ -1,3 +1,28 @@
+NUM_OF_LED_ROWS = 18
+NUM_OF_LED_COLS = 11
+
+HOLDS = [
+#   A   B   C   D   E   F   G   H   I   J   K
+    0   0   0   0   0   0   0   0   0   0   0   #18
+    0   0   0   0   0   0   0   0   0   0   0   #17
+    0   0   0   0   0   0   0   0   0   0   0   #16
+    0   0   0   0   0   0   0   0   0   0   0   #15
+    0   0   0   0   0   0   0   0   0   0   0   #14
+    0   0   0   0   0   0   0   0   0   0   0   #13
+    0   0   0   0   0   0   0   0   0   0   0   #12
+    0   0   0   0   0   0   0   0   0   0   0   #11
+    0   0   0   0   0   0   0   0   0   0   0   #10
+    0   0   0   0   0   0   0   0   0   0   0   #9
+    0   0   0   0   0   0   0   0   0   0   0   #8
+    0   0   0   0   0   0   0   0   0   0   0   #7
+    0   0   0   0   0   0   0   0   0   0   0   #6
+    0   0   0   0   0   0   0   0   0   0   0   #5
+    0   0   0   0   0   0   0   0   0   0   0   #4
+    0   0   0   0   0   0   0   0   0   0   0   #3
+    0   0   0   0   0   0   0   0   0   0   0   #2
+    0   0   0   0   0   0   0   0   0   0   0   #1
+]
+
 
 LED_HOLDS = [
     #A      #B      #C      #D      #E      #F      #G      #H      #I      #J      #K
@@ -33,8 +58,25 @@ class Control:
         self.num_of_leds = num_of_leds
         self.chain = chain
         self.data = [initial_state] * num_of_leds
+<<<<<<< HEAD
         self.led_count = len(LED_HOLDS)
         print ("leds: ", self.led_count)
+=======
+        self.holds_dict = {}
+
+        self.calculate_holds()
+
+    def calculate_holds(self):
+        """
+        Calculate led indices for existing holds according to HOLDS list
+        """
+        true_counter = 1
+        for i in range(len(HOLDS)):
+            if (HOLDS[i] == False): continue
+            self.holds_dict[i+1] = true_counter
+            true_counter += 1
+
+>>>>>>> 6c8e37f9b883069f02d3db08f6a7547fa4a5ca6b
 
     def start(self):
         """
@@ -60,19 +102,44 @@ class Control:
         """
         Change led color
         """
-        i = int(new_data[0])
-        r = int(new_data[1])
-        g = int(new_data[2])
-        b = int(new_data[3])
+        rc = int(new_data[0])
+        r  = int(new_data[1])
+        g  = int(new_data[2])
+        b  = int(new_data[3])
+
+        i = get_index(rc)
 
         if self.check_valid_data(i, r, g, b) == False: return
 
         if i < 0:
             self.set_all_leds(r,g,b)
         else:
-            self.data[i] = (r,g,b)
+            led_index = holds_dict[i]
+            self.data[led_index] = (r,g,b)
 
         self.chain.show(self.data)
+
+    def get_index(self, rc):
+        """
+        Extracts row and column values from input
+        and returns corresponding LED index
+        """
+        try:
+            col = ord(rc[0]) - 64
+            row = int(rc[1:])
+            return convert_rc_to_index(row, col)
+        except:
+            return: -1
+
+    def convert_rc_to_index(self, row, col):
+        """
+        Calculate LED index from row column values
+        """
+        if (row % 2 == 0):
+            return NUM_OF_LED_COLS * row + 1 - col
+        else:
+            return NUM_OF_LED_COLS * (row - 1) + c
+
 
     def check_valid_data(self, index, r, g, b):
         """

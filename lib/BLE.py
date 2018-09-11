@@ -35,7 +35,10 @@ class BLE:
         elif events & Bluetooth.CLIENT_DISCONNECTED:
             print("Device disconnected")
         elif events & Bluetooth.NEW_ADV_EVENT:
+<<<<<<< HEAD
             #print ("Got something")
+=======
+>>>>>>> 6c8e37f9b883069f02d3db08f6a7547fa4a5ca6b
             self.parse_adv()
 
     def parse_adv(self):
