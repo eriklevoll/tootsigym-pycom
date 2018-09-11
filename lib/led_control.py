@@ -2,49 +2,26 @@ NUM_OF_LED_ROWS = 18
 NUM_OF_LED_COLS = 11
 
 HOLDS = [
+    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   #18
+    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   #17
+    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   #16
+    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   #15
+    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   #14
+    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   #13
+    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   #12
+    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   #11
+    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   #10
+    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   #9
+    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   #8
+    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   #7
+    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   #6
+    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   #5
+    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   #4
+    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   #3
+    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   #2
+    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   #1
+]
 #   A   B   C   D   E   F   G   H   I   J   K
-    0   0   0   0   0   0   0   0   0   0   0   #18
-    0   0   0   0   0   0   0   0   0   0   0   #17
-    0   0   0   0   0   0   0   0   0   0   0   #16
-    0   0   0   0   0   0   0   0   0   0   0   #15
-    0   0   0   0   0   0   0   0   0   0   0   #14
-    0   0   0   0   0   0   0   0   0   0   0   #13
-    0   0   0   0   0   0   0   0   0   0   0   #12
-    0   0   0   0   0   0   0   0   0   0   0   #11
-    0   0   0   0   0   0   0   0   0   0   0   #10
-    0   0   0   0   0   0   0   0   0   0   0   #9
-    0   0   0   0   0   0   0   0   0   0   0   #8
-    0   0   0   0   0   0   0   0   0   0   0   #7
-    0   0   0   0   0   0   0   0   0   0   0   #6
-    0   0   0   0   0   0   0   0   0   0   0   #5
-    0   0   0   0   0   0   0   0   0   0   0   #4
-    0   0   0   0   0   0   0   0   0   0   0   #3
-    0   0   0   0   0   0   0   0   0   0   0   #2
-    0   0   0   0   0   0   0   0   0   0   0   #1
-]
-
-
-LED_HOLDS = [
-    #A      #B      #C      #D      #E      #F      #G      #H      #I      #J      #K
-    False,   False,   False,  False,   False,   False,  False,   False,  False,   False,  False,   #18
-    False,   False,   False,  False,   False,   False,  False,   False,  False,   False,  False,   #17
-    False,   False,   False,  False,   False,   False,  False,   False,  False,   False,  False,   #16
-    False,   False,   False,  False,   False,   False,  False,   False,  False,   False,  False,   #15
-    False,   False,   False,  False,   False,   False,  False,   False,  False,   False,  False,   #14
-    False,   False,   False,  False,   False,   False,  False,   False,  False,   False,  False,   #13
-    False,   False,   False,  False,   False,   False,  False,   False,  False,   False,  False,   #12
-    False,   False,   False,  False,   False,   False,  False,   False,  False,   False,  False,   #11
-    False,   False,   False,  False,   False,   False,  False,   False,  False,   False,  False,   #10
-    False,   False,   False,  False,   False,   False,  False,   False,  False,   False,  False,   #9
-    False,   False,   False,  False,   False,   False,  False,   False,  False,   False,  False,   #8
-    False,   False,   False,  False,   False,   False,  False,   False,  False,   False,  False,   #7
-    False,   False,   False,  False,   False,   False,  False,   False,  False,   False,  False,   #6
-    True,   False,   True,  True,   False,   False,  False,   False,  False,   False,  False,   #5
-    False,  False,  False,  False,  False,  False,  False,  False,  False,  False,  False,   #4
-    False,   False,   False,  False,   False,   False,  False,   False,  False,   False,  False,   #3
-    False,  False,  False,  False,  False,  False,  False,  False,  False,  False,  False,   #2
-    False,  False,  False,  False,  False,  False,  False,  False,  False,  False,  False   #1
-]
 
 class Control:
     def __init__(self, chain, num_of_leds, initial_state = (0,0,0)):
@@ -58,10 +35,8 @@ class Control:
         self.num_of_leds = num_of_leds
         self.chain = chain
         self.data = [initial_state] * num_of_leds
-<<<<<<< HEAD
-        self.led_count = len(LED_HOLDS)
+        self.led_count = len(HOLDS)
         print ("leds: ", self.led_count)
-=======
         self.holds_dict = {}
 
         self.calculate_holds()
@@ -76,8 +51,6 @@ class Control:
             self.holds_dict[i+1] = true_counter
             true_counter += 1
 
->>>>>>> 6c8e37f9b883069f02d3db08f6a7547fa4a5ca6b
-
     def start(self):
         """
         Initialize LED data protocol
@@ -91,6 +64,7 @@ class Control:
 
         for index in range(self.num_of_leds):
             self.data[index] = (r,g,b)
+
     def turn_off_leds(self):
         """
         Set led color to 0,0,0
@@ -107,7 +81,8 @@ class Control:
         g  = int(new_data[2])
         b  = int(new_data[3])
 
-        i = get_index(rc)
+        #i = get_index(rc)
+        i = rc
 
         if self.check_valid_data(i, r, g, b) == False: return
 
@@ -129,7 +104,7 @@ class Control:
             row = int(rc[1:])
             return convert_rc_to_index(row, col)
         except:
-            return: -1
+            return -1
 
     def convert_rc_to_index(self, row, col):
         """
