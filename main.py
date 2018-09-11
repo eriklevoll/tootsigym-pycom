@@ -3,6 +3,7 @@ from BLE import BLE
 from led_control import Control
 from utilities import increment_color_all, decrement_color_all
 
+print ("Initiating...")
 
 NUM_OF_LEDS = 100
 
@@ -18,6 +19,8 @@ decrement_color_all(led_control, "red", 20, 0)
 #Initiate Bluetooth and start scanning for devices
 ble = BLE(led_control)
 ble.start_scan()
+
+print ("Ready")
 
 #flash green
 increment_color_all(led_control, "green", 0, 20)

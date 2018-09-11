@@ -1,4 +1,26 @@
 
+LED_HOLDS = [
+    #A      #B      #C      #D      #E      #F      #G      #H      #I      #J      #K
+    False,   False,   False,  False,   False,   False,  False,   False,  False,   False,  False,   #18
+    False,   False,   False,  False,   False,   False,  False,   False,  False,   False,  False,   #17
+    False,   False,   False,  False,   False,   False,  False,   False,  False,   False,  False,   #16
+    False,   False,   False,  False,   False,   False,  False,   False,  False,   False,  False,   #15
+    False,   False,   False,  False,   False,   False,  False,   False,  False,   False,  False,   #14
+    False,   False,   False,  False,   False,   False,  False,   False,  False,   False,  False,   #13
+    False,   False,   False,  False,   False,   False,  False,   False,  False,   False,  False,   #12
+    False,   False,   False,  False,   False,   False,  False,   False,  False,   False,  False,   #11
+    False,   False,   False,  False,   False,   False,  False,   False,  False,   False,  False,   #10
+    False,   False,   False,  False,   False,   False,  False,   False,  False,   False,  False,   #9
+    False,   False,   False,  False,   False,   False,  False,   False,  False,   False,  False,   #8
+    False,   False,   False,  False,   False,   False,  False,   False,  False,   False,  False,   #7
+    False,   False,   False,  False,   False,   False,  False,   False,  False,   False,  False,   #6
+    True,   False,   True,  True,   False,   False,  False,   False,  False,   False,  False,   #5
+    False,  False,  False,  False,  False,  False,  False,  False,  False,  False,  False,   #4
+    False,   False,   False,  False,   False,   False,  False,   False,  False,   False,  False,   #3
+    False,  False,  False,  False,  False,  False,  False,  False,  False,  False,  False,   #2
+    False,  False,  False,  False,  False,  False,  False,  False,  False,  False,  False   #1
+]
+
 class Control:
     def __init__(self, chain, num_of_leds, initial_state = (0,0,0)):
         """
@@ -11,6 +33,8 @@ class Control:
         self.num_of_leds = num_of_leds
         self.chain = chain
         self.data = [initial_state] * num_of_leds
+        self.led_count = len(LED_HOLDS)
+        print ("leds: ", self.led_count)
 
     def start(self):
         """
@@ -54,9 +78,9 @@ class Control:
         """
         Checks if new LED data format is correct
 
-        Returns True if correct, False otherwise
+        Returns False if correct, False otherwise
         """
-        valid = True
+        valid = False
         if (index >= self.num_of_leds):
             print ("bad index", index)
             valid = False

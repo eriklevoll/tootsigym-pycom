@@ -35,7 +35,7 @@ class BLE:
         elif events & Bluetooth.CLIENT_DISCONNECTED:
             print("Device disconnected")
         elif events & Bluetooth.NEW_ADV_EVENT:
-            print ("Got something")
+            #print ("Got something")
             self.parse_adv()
 
     def parse_adv(self):
@@ -43,19 +43,21 @@ class BLE:
         Parse advertisement package data
         """
         adv = self.bluetooth.get_adv()
-        if not adv: return
+        if adv is None: return
 
         device_name = self.bluetooth.resolve_adv_data(adv.data, Bluetooth.ADV_NAME_CMPL)
+        if device_name is None: return
+
         if "MB_APP" in device_name:
             id = device_name.split(":::")[1]
             if (id in self.devices_dict): return
 
             print (id, self.devices_dict)
-            print ("Connecting")
+            print ("Connecting", adv.mac)
 
             conn = self.bluetooth.connect(adv.mac)
             self.devices_dict[id] = conn
-            time.sleep(0.050)
+            time.sleep(0.150)
 
             self.parse_services(conn.services(), id)
 
@@ -84,8 +86,11 @@ class BLE:
         """
         Set notify trigger on characteristic
         """
-        char.callback(trigger=Bluetooth.CHAR_NOTIFY_EVENT, handler=self.characteristic_callback)
-        char.write(b'CONN_OK')
+        try:
+            char.callback(trigger=Bluetooth.CHAR_NOTIFY_EVENT, handler=self.characteristic_callback)
+            char.write(b'CONN_OK')
+        except:
+            print ("Failed to set trigger")
 
     def characteristic_callback(self, characteristic):
         """
@@ -144,3 +149,5 @@ class BLE:
         else:
             print ("wrong number of parameters")
         print (data)
+        #print ("Sleeping")
+        #machine.deepsleep(15000)
