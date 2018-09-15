@@ -147,6 +147,6 @@ class BLE:
             self.led_control.set_new_data((data[0], data[1], data[2], data[3]))
         else:
             print ("wrong number of parameters")
-        print (data)
+        # print (data)
         #print ("Sleeping")
         #machine.deepsleep(15000)

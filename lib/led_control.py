@@ -120,9 +120,9 @@ class Control:
         """
         Checks if new LED data format is correct
 
-        Returns False if correct, False otherwise
+        Returns True if correct, False otherwise
         """
-        valid = False
+        valid = True
         if (index >= self.num_of_leds):
             print ("bad index", index)
             valid = False
