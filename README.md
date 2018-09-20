@@ -1,4 +1,4 @@
-# WS2812 neopixel pycom bluetooth controller
+# WS2812 neopixel pycom mqtt controller
 
 ## Project structure:
 ```
