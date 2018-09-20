@@ -1,3 +1,5 @@
+from ws2812 import WS2812
+
 NUM_OF_LED_ROWS = 18
 NUM_OF_LED_COLS = 11
 
@@ -24,22 +26,23 @@ HOLDS = [
 #   A   B   C   D   E   F   G   H   I   J   K
 
 class Control:
-    def __init__(self, chain, num_of_leds, initial_state = (0,0,0)):
+    def __init__(self, num_of_leds, initial_state = (0,0,0)):
         """
         Constructor
 
         Args:
-            chain: WS2812 control object
             num_of_leds: number of leds to control
         """
+        self.chain = WS2812(ledNumber=num_of_leds, intensity=1)
         self.num_of_leds = num_of_leds
-        self.chain = chain
         self.data = [initial_state] * num_of_leds
         self.led_count = len(HOLDS)
         print ("leds: ", self.led_count)
         self.holds_dict = {}
 
         self.calculate_holds()
+
+        self.start()
 
     def calculate_holds(self):
         """

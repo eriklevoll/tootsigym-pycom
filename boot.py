@@ -1,7 +1,9 @@
 import pycom
-from network import WLAN
+from network import Bluetooth
+​
+#Turn off bluetooth adapter
+bluetooth = Bluetooth()
+bluetooth.deinit()
 
 pycom.heartbeat(False)
-pycom.rgbled(0x001400)
-wlan = WLAN() #close wlan
-wlan.deinit()
+pycom.rgbled(0x000014)

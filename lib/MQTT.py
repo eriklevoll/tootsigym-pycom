@@ -1,15 +1,21 @@
 import _thread
+from network_config import mqtt_config
 from umqtt import MQTTClient
 
 class MQTT:
-    def __init__(self, led_control, device_name, address, port, username, password, topic):
+    def __init__(self, led_control, device_name):
         """
         Constructor
         """
 
         self.led_control    = led_control
-        self.topic = topic
-        self.client = MQTTClient(client_id=device_name, server=address,user=username, password=password, port=port)
+        self.topic          = mqtt_config['topic']
+        self.client = MQTTClient(
+                                client_id   = device_name,
+                                server      = mqtt_config['address'],
+                                user        = mqtt_config['username'],
+                                password    = mqtt_config['user_key'],
+                                port        = mqtt_config['port'])
         self.client.settimeout = self.set_timeout
         self.client.set_callback(self.sub_cb)
 
