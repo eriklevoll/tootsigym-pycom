@@ -4,6 +4,7 @@ from umqtt import MQTTClient
 class MQTT:
     def __init__(self, led_control, device_name, address, port, username, password, topic):
         """
+        Constructor
         """
 
         self.led_control    = led_control
@@ -11,11 +12,23 @@ class MQTT:
         self.client = MQTTClient(client_id=device_name, server=address,user=username, password=password, port=port)
         self.client.settimeout = self.set_timeout
         self.client.set_callback(self.sub_cb)
+
+
+    def start(self):
+        """
+        Initialize MQTT Connection
+        """
         self.client.connect()
         self.client.subscribe(topic=self.topic)
 
         print ("Listening")
         _thread.start_new_thread(self.start_listening, ())
+
+    def stop(self):
+        """
+        Disconnect and stop listening
+        """
+        pass
 
     def sub_cb(self, topic, message):
         """

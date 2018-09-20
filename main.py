@@ -2,6 +2,8 @@ from ws2812 import WS2812
 import machine
 from MQTT import MQTT
 from led_control import Control
+from WiFi import WiFi
+from network_config import mqtt_config
 from utilities import increment_color_all, decrement_color_all
 
 print ("Initiating...")
@@ -17,20 +19,15 @@ led_control.start()
 increment_color_all(led_control, "red", 0, 20)
 decrement_color_all(led_control, "red", 20, 0)
 
-NETWORK_NAME        = "Tehnolabor"
-NETWORK_KEY         = "009E00B7C9"
-NETWORK_SECURITY    = 4
-
-wlan = WLAN(mode=WLAN.STA)
-wlan.connect(NETWORK_NAME, auth=(NETWORK_SECURITY, NETWORK_KEY), timeout= 5000)
-
-while not wlan.isconnected():
-    machine.idle()
-
-print ("Connected to WiFi\n")
-
-#Initiate MQTT and start listening for messages
-mqtt = MQTT(led_control, "Moonmoon", "m20.cloudmqtt.com", 11957, "ayogkqnq", "_e4HiuI73ywB", "moon")
+#Initialize MQTT
+mqtt = MQTT(led_control, "Moonmoon",
+                mqtt_config['address'],
+                mqtt_config['port'],
+                mqtt_config['username'],
+                mqtt_config['user_key'],
+                mqtt_config['topic'])
+#Initialize WiFi and start scanning for networks
+wifi = WiFi(mqtt)
 
 print ("Ready")
 
