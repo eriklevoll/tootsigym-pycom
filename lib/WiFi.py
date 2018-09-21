@@ -1,8 +1,8 @@
 from network import WLAN
 import _thread
-from netwok_config import saved_networks
+from network_config import saved_networks
 import pycom
-import Timer
+from machine import Timer
 import time
 
 
@@ -20,7 +20,7 @@ class WiFi:
         """
         self.mqtt       = mqtt
         self.wlan       = WLAN(mode=WLAN.STA)
-        self.nets       = wlan.scan()
+        self.nets       = self.wlan.scan()
         self.connected  = False
 
         #Set up 1 second connection test timer
@@ -51,7 +51,8 @@ class WiFi:
         while not connected:
             connected = self.find_network()
             time.sleep(2)
-
+        print ("WLAN:", self.wlan.isconnected())
+        print ("Starting mqtt")
         self.mqtt.start()
 
     def find_network(self):
@@ -101,7 +102,7 @@ class WiFi:
         print ("End of open networks. Connected:", connected)
         return connected
 
-    def wait_network_connect(self, timeout = 5):
+    def wait_network_connect(self, timeout = 10):
         """
         Wait for the network to connect.
         If no connection during timeout, return False. True otherwise

@@ -24,7 +24,9 @@ class MQTT:
         """
         Initialize MQTT Connection
         """
+        print ("Connecting mqtt", mqtt_config['address'], mqtt_config['username'], mqtt_config['user_key'], mqtt_config['port'])
         self.client.connect()
+        print ("Subscribing")
         self.client.subscribe(topic=self.topic)
 
         print ("Listening")

@@ -1,7 +1,6 @@
 import pycom
 from network import Bluetooth
-​
-#Turn off bluetooth adapter
+
 bluetooth = Bluetooth()
 bluetooth.deinit()
 
