@@ -1,4 +1,5 @@
 import utime
+import time
 import usocket as socket
 import ustruct as struct
 from ubinascii import hexlify
@@ -88,7 +89,7 @@ class MQTTBaseClient:
         return resp[2] & 1
 
     def disconnect(self):
-        self.sock.write(b"\xe0\0")
+        #self.sock.write(b"\xe0\0")
         self.sock.close()
 
     def ping(self):

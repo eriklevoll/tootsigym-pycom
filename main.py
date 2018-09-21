@@ -9,7 +9,7 @@ print ("Initiating...")
 led_control = Control(num_of_leds = 198, initial_state = (0,255,0))
 
 #Initialize MQTT
-mqtt = MQTT(led_control, device_name = "Moonmoon")
+mqtt = MQTT(led_control, device_name = "moon_pycom")
 #Initialize WiFi and start scanning for networks
 wifi = WiFi(mqtt)
 

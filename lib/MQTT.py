@@ -1,6 +1,7 @@
 import _thread
 from network_config import mqtt_config
 from umqtt import MQTTClient
+import gc
 
 class MQTT:
     def __init__(self, led_control, device_name):
@@ -10,33 +11,40 @@ class MQTT:
 
         self.led_control    = led_control
         self.topic          = mqtt_config['topic']
-        self.client = MQTTClient(
-                                client_id   = device_name,
-                                server      = mqtt_config['address'],
-                                user        = mqtt_config['username'],
-                                password    = mqtt_config['user_key'],
-                                port        = mqtt_config['port'])
-        self.client.settimeout = self.set_timeout
-        self.client.set_callback(self.sub_cb)
-
+        self.device_name    = device_name
 
     def start(self):
         """
         Initialize MQTT Connection
         """
+        print ("Creating client")
+        self.client = MQTTClient(
+                                client_id   = self.device_name,
+                                server      = mqtt_config['address'],
+                                user        = mqtt_config['username'],
+                                password    = mqtt_config['user_key'],
+                                port        = mqtt_config['port'])
+        print ("Setting timeout")
+        self.client.settimeout = self.set_timeout
+        print ("Setting callback")
+        self.client.set_callback(self.sub_cb)
         print ("Connecting mqtt", mqtt_config['address'], mqtt_config['username'], mqtt_config['user_key'], mqtt_config['port'])
         self.client.connect()
         print ("Subscribing")
         self.client.subscribe(topic=self.topic)
 
+        self.client.set_last_will(self.topic, "Bye")
+
         print ("Listening")
         _thread.start_new_thread(self.start_listening, ())
+
+        gc.collect()
 
     def stop(self):
         """
         Disconnect and stop listening
         """
-        pass
+        self.client.disconnect()
 
     def sub_cb(self, topic, message):
         """
@@ -70,3 +78,4 @@ class MQTT:
     def start_listening(self):
         while True:
             self.client.check_msg()
+            gc.collect()

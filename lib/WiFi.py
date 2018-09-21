@@ -1,8 +1,10 @@
 from network import WLAN
 import _thread
-from network_config import saved_networks
+from network_config import saved_networks, ignore_networks
 import pycom
+import machine
 from machine import Timer
+import gc
 import time
 
 
@@ -37,16 +39,29 @@ class WiFi:
         if not self.connected and self.wlan.isconnected():
             self.connected = True
             pycom.rgbled(0x008000)
+            gc.collect()
         elif self.connected and not self.wlan.isconnected():
+            self.mqtt.stop()
             self.connected = False
             pycom.rgbled(0x800000)
-            _thread.start_new_thread(self.connect, ())
+            machine.reset()
+             # _thread.start_new_thread(self.connect, ())
+            #self.connect()
+
+        # print ("Memory: ", gc.mem_free())
+        # gc.collect()
+
 
     def connect(self):
         """
         Finds suitable networks and connects.
         If connection successful, initialize mqtt
         """
+        # while True:
+        #     if self.wlan.isconnected():
+        #         time.sleep(1)
+        #         continue
+
         connected = False
         while not connected:
             connected = self.find_network()
@@ -54,11 +69,15 @@ class WiFi:
         print ("WLAN:", self.wlan.isconnected())
         print ("Starting mqtt")
         self.mqtt.start()
+        gc.collect()
 
     def find_network(self):
         """
         """
         print ("Finding networks")
+        self.nets = self.wlan.scan()
+        time.sleep(0.5)
+        print (self.nets)
         saved_network = self.scan_saved_networks()
         print ("Saved network:", saved_network)
         if saved_network is not None:
@@ -138,9 +157,19 @@ class WiFi:
         print ("Scanning open networks")
         open_nets = []
         for net in self.nets:
-            if net.sec is None :
+            if net.sec == 0 and not self.in_ignore_networks(net.ssid):
                 open_nets.append(net.ssid)
 
         print ("Found open networks:", open_nets)
         if len(open_nets) == 0: return None
         else: return open_nets
+
+    def in_ignore_networks(self, ssid):
+        """
+        """
+        for keyword in ignore_networks:
+            print ("comparing",keyword,ssid)
+            if keyword in ssid.lower(): return True
+
+        print ("Bad network")
+        return False
