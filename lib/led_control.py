@@ -79,21 +79,20 @@ class Control:
         """
         Change led color
         """
-        rc = int(new_data[0])
+        #rc = int(new_data[0])
+        rc = new_data[0]
         r  = int(new_data[1])
         g  = int(new_data[2])
         b  = int(new_data[3])
 
-        #i = get_index(rc)
-        i = rc
+        i = self.get_index(rc)
 
         if self.check_valid_data(i, r, g, b) == False: return
 
         if i < 0:
             self.set_all_leds(r,g,b)
         else:
-            led_index = holds_dict[i]
-            self.data[led_index] = (r,g,b)
+            self.data[i] = (r,g,b)
 
         self.chain.show(self.data)
 
@@ -105,7 +104,7 @@ class Control:
         try:
             col = ord(rc[0]) - 64
             row = int(rc[1:])
-            return convert_rc_to_index(row, col)
+            return self.convert_rc_to_index(row, col)
         except:
             return -1
 
@@ -114,10 +113,9 @@ class Control:
         Calculate LED index from row column values
         """
         if (row % 2 == 0):
-            return NUM_OF_LED_COLS * row + 1 - col
+            return NUM_OF_LED_COLS * (row - 1) + col
         else:
-            return NUM_OF_LED_COLS * (row - 1) + c
-
+            return NUM_OF_LED_COLS * row + 1 - col
 
     def check_valid_data(self, index, r, g, b):
         """
