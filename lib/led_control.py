@@ -85,10 +85,10 @@ class Control:
         g  = int(new_data[2])
         b  = int(new_data[3])
 
-        i = self.get_index(rc)
+        i = self.get_index(rc) - 1
 
         if self.check_valid_data(i, r, g, b) == False: return
-
+        print ("index: ", i)
         if i < 0:
             self.set_all_leds(r,g,b)
         else:
