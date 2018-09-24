@@ -11,6 +11,7 @@ class MQTT:
 
         self.led_control    = led_control
         self.topic          = mqtt_config['topic']
+        self.resp_topic     = mqtt_config['resp_topic']
         self.device_name    = device_name
 
     def start(self):
@@ -33,7 +34,7 @@ class MQTT:
         print ("Subscribing")
         self.client.subscribe(topic=self.topic)
 
-        self.client.set_last_will(self.topic, "Bye")
+        self.client.set_last_will(self.resp_topic, "Bye")
 
         print ("Listening")
         _thread.start_new_thread(self.start_listening, ())
@@ -45,6 +46,9 @@ class MQTT:
         Disconnect and stop listening
         """
         self.client.disconnect()
+
+    def send_data(self, data):
+        self.client.publish(topic=self.resp_topic, msg=data)
 
     def sub_cb(self, topic, message):
         """
@@ -61,19 +65,23 @@ class MQTT:
         """
         Chooses correct response for new characteristic value
         """
-        data = data.decode('utf-8').split(",")
+        decoded = data.decode('utf-8')
+        #Echo data back to MQTT backend
+        self.send_data("resp:" + decoded)
+
+        data = decoded.split(",")
         print (data)
         size = len(data)
-        if (size == 0):
+        if (size == 0 or size > 4):
             print ("bad input")
-        elif (size == 1):
+            return
+
+        if (size == 1):
             self.led_control.turn_off_leds()
         elif (size == 2):
             self.led_control.set_new_data((data[0], data[1], data[1], data[1]))
         elif (size == 4):
             self.led_control.set_new_data((data[0], data[1], data[2], data[3]))
-        else:
-            print ("wrong number of parameters")
 
     def start_listening(self):
         while True:
