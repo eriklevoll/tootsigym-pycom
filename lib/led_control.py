@@ -83,8 +83,7 @@ class Control:
         elif data[0] == "blue": b = 255
         elif data[0] == "red": r = 255
 
-        for i, val in enumerate(data):
-            if i == 0: continue
+        for i, val in enumerate(data, start=1):
             hold_index = self.get_index(val) - 1
             if not self.check_valid_data(hold_index, r, g, b): continue
             self.data[hold_index] = (r,g,b)
