@@ -82,6 +82,8 @@ class MQTT:
             self.led_control.set_new_data((data[0], data[1], data[1], data[1]))
         elif (size == 4):
             self.led_control.set_new_data((data[0], data[1], data[2], data[3]))
+        elif (size > 4):
+            self.led_control.set_route(data)
 
     def start_listening(self):
         while True:

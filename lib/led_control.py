@@ -74,6 +74,23 @@ class Control:
         """
         self.set_all_leds(0,0,0)
 
+    def set_route(data):
+        """
+        Turn on leds green/blue/red corresponding to a specific route
+        """
+        r,g,b = 0,0,0
+        if data[0] == "green": g = 255
+        elif data[0] == "blue": b = 255
+        elif data[0] == "red": r = 255
+
+        for i, val in enumerate(data):
+            if i == 0: continue
+            hold_index = self.get_index(val) - 1
+            if not self.check_valid_data(hold_index, r, g, b): continue
+            self.data[hold_index] = (r,g,b)
+
+        self.chain.show(self.data)
+
     def set_new_data(self, new_data):
         """
         Change led color
