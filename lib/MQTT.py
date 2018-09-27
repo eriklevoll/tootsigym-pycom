@@ -70,7 +70,7 @@ class MQTT:
         self.send_data("resp:" + decoded)
         if ("," not in decoded): return
         data = decoded.split(",")
-        print (data)
+        #print (data)
         size = len(data)
         if (size == 0 or size > 4):
             print ("bad input")
@@ -86,4 +86,4 @@ class MQTT:
     def start_listening(self):
         while True:
             self.client.check_msg()
-            gc.collect()
+            #gc.collect()

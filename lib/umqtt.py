@@ -130,7 +130,7 @@ class MQTTBaseClient:
         elif qos == 2:
             assert 0
 
-    def subscribe(self, topic, qos=0):
+    def subscribe(self, topic, qos=1):
         assert self.cb is not None, "Subscribe callback is not set"
         pkt = bytearray(b"\x82\0\0\0")
         self.pid += 1
