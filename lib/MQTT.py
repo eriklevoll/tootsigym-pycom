@@ -68,7 +68,7 @@ class MQTT:
         decoded = data.decode('utf-8')
         #Echo data back to MQTT backend
         self.send_data("resp:" + decoded)
-
+        if ("," not in decoded): return
         data = decoded.split(",")
         print (data)
         size = len(data)

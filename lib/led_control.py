@@ -73,7 +73,6 @@ class Control:
         Set led color to 0,0,0
         """
         self.set_all_leds(0,0,0)
-        self.chain.show(self.data)
 
     def set_new_data(self, new_data):
         """
@@ -85,7 +84,8 @@ class Control:
         g  = int(new_data[2])
         b  = int(new_data[3])
 
-        i = self.get_index(rc) - 1
+        if rc == "-1": i = -1
+        else: i = self.get_index(rc) - 1
 
         if self.check_valid_data(i, r, g, b) == False: return
         print ("index: ", i)
@@ -125,7 +125,7 @@ class Control:
         """
         valid = True
         if (index >= self.num_of_leds):
-            print ("bad index", index)
+            print ("bad index", index, self.num_of_leds)
             valid = False
         if (r < 0 or r > 255):
             print ("bad color value (r)", r)
