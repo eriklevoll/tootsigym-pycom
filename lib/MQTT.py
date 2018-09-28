@@ -68,11 +68,15 @@ class MQTT:
         decoded = data.decode('utf-8')
         #Echo data back to MQTT backend
         self.send_data("resp:" + decoded)
+
+        if ";" in decoded:
+            self.led_control.set_route(decoded)
+            return
         if ("," not in decoded): return
         data = decoded.split(",")
         #print (data)
         size = len(data)
-        if (size == 0 or size > 4):
+        if (size == 0):
             print ("bad input")
             return
 
@@ -82,8 +86,6 @@ class MQTT:
             self.led_control.set_new_data((data[0], data[1], data[1], data[1]))
         elif (size == 4):
             self.led_control.set_new_data((data[0], data[1], data[2], data[3]))
-        elif (size > 4):
-            self.led_control.set_route(data)
 
     def start_listening(self):
         while True:

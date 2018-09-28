@@ -74,21 +74,29 @@ class Control:
         """
         self.set_all_leds(0,0,0)
 
-    def set_route(data):
+    def set_route(self, data):
         """
         Turn on leds green/blue/red corresponding to a specific route
         """
-        r,g,b = 0,0,0
-        if data[0] == "green": g = 255
-        elif data[0] == "blue": b = 255
-        elif data[0] == "red": r = 255
 
-        for i, val in enumerate(data, start=1):
-            hold_index = self.get_index(val) - 1
-            if not self.check_valid_data(hold_index, r, g, b): continue
-            self.data[hold_index] = (r,g,b)
+        datalist = data.split(";")
+        print ("Setting route colors")
+        self.set_route_color(datalist[0], (0,255,0))
+        self.set_route_color(datalist[1], (0,0,255))
+        self.set_route_color(datalist[2], (255,0,0))
 
         self.chain.show(self.data)
+
+    def set_route_color(self, data, color):
+        """
+        Submethod for setting hold leds for one color
+        """
+        try:
+            for rc in data.split(","):
+                hold_index = self.get_index(rc) - 1
+                self.data[hold_index] = color
+        except:
+            print ("Failed to set color for", green, rc, data)
 
     def set_new_data(self, new_data):
         """
