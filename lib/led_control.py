@@ -81,6 +81,7 @@ class Control:
 
         datalist = data.split(";")
         print ("Setting route colors")
+        self.set_all_leds(0,0,0)
         self.set_route_color(datalist[0], (0,255,0))
         self.set_route_color(datalist[1], (0,0,255))
         self.set_route_color(datalist[2], (255,0,0))

@@ -1,7 +1,6 @@
 from MQTT import MQTT
 from WiFi import WiFi
 from led_control import Control
-from utilities import increment_color_all, decrement_color_all
 
 print ("Initiating...")
 
