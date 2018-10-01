@@ -3,6 +3,7 @@ import time
 import usocket as socket
 import ustruct as struct
 from ubinascii import hexlify
+import _thread
 
 class MQTTException(Exception):
     pass
@@ -153,6 +154,25 @@ class MQTTBaseClient:
     # Subscribed messages are delivered to a callback previously
     # set by .set_callback() method. Other (internal) MQTT
     # messages processed internally.
+    def parse_msg(self, op):
+        sz = self._recv_len()
+        topic_len = self.sock.read(2)
+        topic_len = (topic_len[0] << 8) | topic_len[1]
+        topic = self.sock.read(topic_len)
+        sz -= topic_len + 2
+        if op & 6:
+            pid = self.sock.read(2)
+            pid = pid[0] << 8 | pid[1]
+            sz -= 2
+        msg = self.sock.read(sz)
+        self.cb(topic, msg)
+        if op & 6 == 2:
+            pkt = bytearray(b"\x40\x02\0\0")
+            struct.pack_into("!H", pkt, 2, pid)
+            self.sock.write(pkt)
+        elif op & 6 == 4:
+            assert 0
+
     def wait_msg(self):
         res = self.sock.read(1)
         self.sock.setblocking(True)
@@ -167,6 +187,8 @@ class MQTTBaseClient:
         op = res[0]
         if op & 0xf0 != 0x30:
             return op
+        #_thread.start_new_thread(self.parse_msg, ())
+
         sz = self._recv_len()
         topic_len = self.sock.read(2)
         topic_len = (topic_len[0] << 8) | topic_len[1]
@@ -190,7 +212,8 @@ class MQTTBaseClient:
     # the same processing as wait_msg.
     def check_msg(self):
         self.sock.setblocking(False)
-        return self.wait_msg()
+        #_thread.start_new_thread(self.wait_msg, ())
+        self.wait_msg()
 
 
 

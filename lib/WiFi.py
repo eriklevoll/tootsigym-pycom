@@ -45,23 +45,12 @@ class WiFi:
             self.connected = False
             pycom.rgbled(0x800000)
             machine.reset()
-             # _thread.start_new_thread(self.connect, ())
-            #self.connect()
-
-        # print ("Memory: ", gc.mem_free())
-        # gc.collect()
-
 
     def connect(self):
         """
         Finds suitable networks and connects.
         If connection successful, initialize mqtt
         """
-        # while True:
-        #     if self.wlan.isconnected():
-        #         time.sleep(1)
-        #         continue
-
         connected = False
         while not connected:
             connected = self.find_network()

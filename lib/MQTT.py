@@ -2,6 +2,8 @@ import _thread
 from network_config import mqtt_config
 from umqtt import MQTTClient
 import gc
+import time
+from machine import Timer
 
 class MQTT:
     def __init__(self, led_control, device_name):
@@ -37,7 +39,7 @@ class MQTT:
         self.client.set_last_will(self.resp_topic, "Bye")
 
         print ("Listening")
-        _thread.start_new_thread(self.start_listening, ())
+        Timer.Alarm(self.check_new_messages, 0.0075, periodic=True)
 
         gc.collect()
 
@@ -87,7 +89,5 @@ class MQTT:
         elif (size == 4):
             self.led_control.set_new_data((data[0], data[1], data[2], data[3]))
 
-    def start_listening(self):
-        while True:
-            self.client.check_msg()
-            #gc.collect()
+    def check_new_messages(self, alarm):
+        self.client.check_msg()

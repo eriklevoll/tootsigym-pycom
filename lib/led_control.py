@@ -80,7 +80,6 @@ class Control:
         """
 
         datalist = data.split(";")
-        print ("Setting route colors")
         self.set_all_leds(0,0,0)
         self.set_route_color(datalist[0], (0,255,0))
         self.set_route_color(datalist[1], (0,0,255))
@@ -113,7 +112,6 @@ class Control:
         else: i = self.get_index(rc) - 1
 
         if self.check_valid_data(i, r, g, b) == False: return
-        #print ("index: ", i)
         if i < 0:
             self.set_all_leds(r,g,b)
         else:
