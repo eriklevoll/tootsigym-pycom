@@ -38,7 +38,8 @@ class Control:
         self.data = [initial_state] * num_of_leds
         self.led_count = len(HOLDS)
         print ("leds: ", self.led_count)
-        self.holds_dict = {}
+        self.holds_dict = { }
+        self.leds_state = { 'start': [], 'mid': [], 'top': [] }
 
         self.calculate_holds()
 
@@ -64,6 +65,9 @@ class Control:
         """
         Change color value for all leds simultaneously
         """
+
+        #Clear any current routes
+        self.leds_state = { 'start': [], 'mid': [], 'top': [] }
 
         for index in range(self.num_of_leds):
             self.data[index] = (r,g,b)
@@ -93,10 +97,11 @@ class Control:
         """
         try:
             for rc in data.split(","):
+                self.update_leds_state(rc, color[0], color[1], color[2])
                 hold_index = self.get_index(rc) - 1
                 self.data[hold_index] = color
         except:
-            print ("Failed to set color for", green, rc, data)
+            print ("Failed to set color for", color, rc, data)
 
     def set_new_data(self, new_data):
         """
@@ -117,8 +122,62 @@ class Control:
             self.set_all_leds(r,g,b)
         else:
             self.data[i] = (r,g,b)
+            self.update_leds_state(rc, r, g, b)
 
         self.chain.show(self.data)
+
+    def update_leds_state(self, rc, r, g, b):
+        """
+        """
+        #remove and previous occurrences
+        self.remove_led_element(rc)
+
+        if (r > 0 and g == 0 and b == 0):
+            self.add_led_element(rc, 'top')
+        elif (r == 0 and g > 0 and b == 0):
+            self.add_led_element(rc, 'start')
+        elif (r == 0 and g == 0 and b > 0):
+            self.add_led_element(rc, 'mid')
+
+        # print (self.leds_state)
+
+    def remove_led_element(self, rc):
+        """
+        """
+        try:
+            for hold_type in self.leds_state:
+                if rc in self.leds_state[hold_type]:
+                    self.leds_state[hold_type].remove(rc)
+        except:
+            print ("Failed to remove element", rc)
+
+    def add_led_element(self, rc, hold_type):
+        """
+        """
+        try:
+            self.leds_state[hold_type].append(rc)
+        except:
+            print ("Failed to add new element", rc, hold_type)
+
+    def compose_status_response(self):
+        """
+        """
+        resp_data = ""
+        for hold in self.leds_state['start']:
+            resp_data += hold + ","
+        resp_data += ";"
+        for hold in self.leds_state['mid']:
+            resp_data += hold + ","
+        resp_data += ";"
+        for hold in self.leds_state['top']:
+            resp_data += hold + ","
+
+        if (resp_data[-1] == ','): resp_data = resp_data[:-1]
+        resp_data = resp_data.replace(",;", ";")
+
+        # print (resp_data)
+
+        return resp_data
 
     def get_index(self, rc):
         """

@@ -69,6 +69,14 @@ class MQTT:
         """
         decoded = data.decode('utf-8')
         #Echo data back to MQTT backend
+
+        if "status" in decoded:
+            resp_data = self.led_control.compose_status_response()
+            self.send_data("resp:" + resp_data)
+            return
+
+        # print (decoded)
+
         self.send_data("resp:" + decoded)
 
         if ";" in decoded:
