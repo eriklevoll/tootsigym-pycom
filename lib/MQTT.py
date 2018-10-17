@@ -4,6 +4,7 @@ from umqtt import MQTTClient
 import gc
 import time
 from machine import Timer
+import pycom
 
 class MQTT:
     def __init__(self, led_control, device_name):
@@ -39,6 +40,8 @@ class MQTT:
         self.client.set_last_will(self.resp_topic, "Bye")
 
         print ("Listening")
+        pycom.rgbled(0x008000)
+
         Timer.Alarm(self.check_new_messages, 0.0075, periodic=True)
 
         gc.collect()

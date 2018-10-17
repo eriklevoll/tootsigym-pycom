@@ -38,8 +38,6 @@ class WiFi:
         """
         if not self.connected and self.wlan.isconnected():
             self.connected = True
-            pycom.rgbled(0x008000)
-            gc.collect()
         elif self.connected and not self.wlan.isconnected():
             self.mqtt.stop()
             self.connected = False
