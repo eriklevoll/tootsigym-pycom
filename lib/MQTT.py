@@ -40,7 +40,7 @@ class MQTT:
         self.client.set_last_will(self.resp_topic, "Bye")
 
         print ("Listening")
-        pycom.rgbled(0x008000)
+        pycom.rgbled(0x00ff00)
 
         Timer.Alarm(self.check_new_messages, 0.0075, periodic=True)
 

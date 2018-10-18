@@ -4,6 +4,8 @@ from led_control import Control
 
 print ("Initiating...")
 
+pycom.rgbled(0xff0000)
+
 #Initiate LED control
 led_control = Control(num_of_leds = 198, initial_state = (0,0,0))
 

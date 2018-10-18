@@ -5,4 +5,4 @@ bluetooth = Bluetooth()
 bluetooth.deinit()
 
 pycom.heartbeat(False)
-pycom.rgbled(0x800000)
+pycom.rgbled(0xffffff)
