@@ -1,4 +1,4 @@
-from ws2812 import WS2812
+from NeoPixel import WS2812
 
 NUM_OF_LED_ROWS = 18
 NUM_OF_LED_COLS = 11
