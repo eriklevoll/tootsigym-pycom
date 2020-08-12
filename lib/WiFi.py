@@ -36,13 +36,16 @@ class WiFi:
         Check WiFi connection state.
         Change PyCom LED correspondingly
         """
-        if not self.connected and self.wlan.isconnected():
-            self.connected = True
-        elif self.connected and not self.wlan.isconnected():
-            self.mqtt.stop()
-            self.connected = False
-            pycom.rgbled(0x800000)
-            machine.reset()
+        try:
+            if not self.connected and self.wlan.isconnected():
+                self.connected = True
+            elif self.connected and not self.wlan.isconnected():
+                self.mqtt.stop()
+                self.connected = False
+                pycom.rgbled(0x800000)
+                machine.reset()
+        except:
+            print ("Bad connection")
 
     def connect(self):
         """
@@ -84,14 +87,17 @@ class WiFi:
     def connect_saved_network(self, network):
         """
         """
-        network_key         = saved_networks[network][0]
-        network_security    = saved_networks[network][1]
-        print ("Connecting saved network:", network, network_key, network_security)
-        self.wlan.connect(network,
-            auth=(network_security, network_key),
-            timeout= 5000)
+        try:
+            network_key         = saved_networks[network][0]
+            network_security    = saved_networks[network][1]
+            print ("Connecting saved network:", network, network_key, network_security)
+            self.wlan.connect(network,
+                auth=(network_security, network_key),
+                timeout= 5000)
 
-        return self.wait_network_connect()
+            return self.wait_network_connect()
+        except:
+            return False
 
     def connect_open_network(self, networks):
         """

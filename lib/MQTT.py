@@ -33,7 +33,11 @@ class MQTT:
         print ("Setting callback")
         self.client.set_callback(self.sub_cb)
         print ("Connecting mqtt", mqtt_config['address'], mqtt_config['username'], mqtt_config['user_key'], mqtt_config['port'])
-        self.client.connect()
+        res = self.client.connect()
+        if (res == -1):
+            print ("Failed to connect")
+            pycom.rgbled(0xB900B9)
+            return
         print ("Subscribing")
         self.client.subscribe(topic=self.topic)
 

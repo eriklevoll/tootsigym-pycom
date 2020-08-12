@@ -82,7 +82,6 @@ class Control:
         """
         Turn on leds green/blue/red corresponding to a specific route
         """
-
         datalist = data.split(";")
         self.set_all_leds(0,0,0)
         self.set_route_color(datalist[0], (0,255,0))
